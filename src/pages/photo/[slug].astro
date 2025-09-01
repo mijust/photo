@@ -1,0 +1,158 @@
+---
+import type { SanityDocument } from "@sanity/client";
+import { urlForImage } from "../../sanity/lib/url-for-image";
+import { loadQuery } from "../../sanity/lib/load-query";
+import Layout from "../../layouts/Layout.astro";
+
+export async function getStaticPaths() {
+  const { data: photos } = await loadQuery<SanityDocument[]>({
+    query: `*[_type == "photo" && defined(slug.current)]`,
+  });
+
+  return photos.map(({ slug }) => {
+    return {
+      params: {
+        slug: slug.current,
+      },
+    };
+  });
+}
+
+const { params } = Astro;
+
+const { data: photo } = await loadQuery<any>({
+  query: `*[_type == "photo" && slug.current == $slug][0]`,
+  params,
+});
+
+const formattedDate = photo.dateTaken ? new Date(photo.dateTaken).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+}) : null;
+---
+
+<Layout title={photo.title}>
+  <main class="main-content">
+    <article class="photo-container">
+      <div class="photo-header">
+        <h1 class="photo-title">{photo.title}</h1>
+        {formattedDate && (
+          <p class="photo-date">Captured on {formattedDate}</p>
+        )}
+      </div>
+
+      {photo.image && (
+        <div class="image-wrapper">
+          <img 
+            src={urlForImage(photo.image).width(2000).quality(90).url()} 
+            alt={photo.image.alt || ""} 
+            class="main-photo"
+          />
+        </div>
+      )}
+
+      <div class="photo-details">
+        {photo.description && (
+          <div class="detail-section description">
+            <h2>Description</h2>
+            <p>{photo.description}</p>
+          </div>
+        )}
+
+        <div class="detail-section tech-details">
+          <h2>Details</h2>
+          <ul>
+            {photo.camera && <li><strong>Camera:</strong> {photo.camera}</li>}
+            {photo.settings?.aperture && <li><strong>Aperture:</strong> {photo.settings.aperture}</li>}
+            {photo.settings?.shutterSpeed && <li><strong>Shutter Speed:</strong> {photo.settings.shutterSpeed}</li>}
+            {photo.settings?.iso && <li><strong>ISO:</strong> {photo.settings.iso}</li>}
+          </ul>
+        </div>
+      </div>
+
+    </article>
+  </main>
+</Layout>
+
+<style>
+  .main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2.5rem;
+  }
+
+  .photo-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .photo-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .photo-date {
+    color: var(--text-secondary);
+    font-size: 1rem;
+  }
+
+  .image-wrapper {
+    margin-bottom: 4rem;
+    background-color: #f0f0f0;
+  }
+
+  .main-photo {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .photo-details {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 4rem;
+  }
+
+  .detail-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 1.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+  }
+
+  .description p {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .tech-details ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tech-details li {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .tech-details strong {
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .photo-details {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+    .photo-title {
+      font-size: 2.25rem;
+    }
+  }
+</style>
