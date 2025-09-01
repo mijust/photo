@@ -36,6 +36,19 @@ export const photoType = defineType({
         type: 'text',
     }),
     defineField({
+      name: 'featured',
+      title: 'Featured',
+      type: 'boolean',
+      description: 'Mark this photo to feature it on the homepage.',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'categories',
+      title: 'Categories',
+      type: 'array',
+      of: [{ type: 'reference', to: { type: 'category' } }],
+    }),
+    defineField({
       name: "dateTaken",
       type: "datetime",
     }),

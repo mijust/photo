@@ -1,3 +1,6 @@
+---
+import Navigation from '../components/Navigation.tsx';
+---
 <!doctype html>
 <html lang="en">
 	<head>
@@ -6,8 +9,12 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro Basics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 	</head>
 	<body>
+		<Navigation client:only="react" />
 		<slot />
 	</body>
 </html>
