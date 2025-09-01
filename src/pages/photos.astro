@@ -1,0 +1,64 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PhotoGrid from '../components/PhotoGrid.tsx';
+
+const { category } = Astro.params;
+const categoryFromQuery = Astro.url.searchParams.get('category');
+---
+
+<Layout title="Photo Gallery - Urban Pixels">
+  <main class="main-content">
+    <header class="page-header">
+      <h1 class="page-title">{categoryFromQuery ? `${categoryFromQuery} Photos` : 'All Photos'}</h1>
+      <p class="page-subtitle">A collection of my work.</p>
+    </header>
+
+    <section>
+      <PhotoGrid client:only="react" category={categoryFromQuery} />
+    </section>
+  </main>
+</Layout>
+
+<style>
+  :root {
+    --text-dark-blue: #1a202c;
+    --light-gray: #F8F9FA;
+  }
+
+  .main-content {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+  }
+
+  .page-header {
+    padding: 4rem 0;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 4rem;
+  }
+
+  .page-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: var(--text-dark-blue);
+    text-transform: capitalize;
+  }
+
+  .page-subtitle {
+    font-size: 1.2rem;
+    color: #4A5568;
+    margin: 0;
+  }
+
+  @media (max-width: 600px) {
+    .main-content {
+      padding: 0 1.5rem;
+    }
+    .page-header {
+      padding: 3rem 0;
+      margin-bottom: 3rem;
+    }
+  }
+</style>
