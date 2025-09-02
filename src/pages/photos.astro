@@ -1,9 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PhotoGrid from '../components/PhotoGrid.tsx';
+import { loadQuery } from '../sanity/lib/load-query';
+import type { SanityDocument } from '@sanity/client';
 
-const { category } = Astro.params;
 const categoryFromQuery = Astro.url.searchParams.get('category');
+
+let query = `*[_type == "photo"]`;
+const params: { [key: string]: any } = {};
+
+if (categoryFromQuery) {
+  // This query filters photos that have a category with a matching title.
+  // It requires that the 'categories' field in the photo document is an array of references to category documents.
+  query += `[count((categories[]->title)[@ in [$category]]) > 0]`;
+  params.category = categoryFromQuery;
+}
+
+query += ` | order(_createdAt desc)`;
+
+const { data: photos } = await loadQuery<SanityDocument[]>(query, params);
 ---
 
 <Layout title="Photo Gallery - Urban Pixels">
@@ -14,7 +29,7 @@ const categoryFromQuery = Astro.url.searchParams.get('category');
     </header>
 
     <section>
-      <PhotoGrid client:only="react" category={categoryFromQuery} />
+      <PhotoGrid photos={photos || []} client:only="react" />
     </section>
   </main>
 </Layout>
@@ -23,6 +38,7 @@ const categoryFromQuery = Astro.url.searchParams.get('category');
   :root {
     --text-dark-blue: #1a202c;
     --light-gray: #F8F9FA;
+    --border-color: #e2e8f0;
   }
 
   .main-content {

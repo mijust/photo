@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import type { SanityDocument } from '@sanity/client';
-import { loadQuery } from '../sanity/lib/load-query';
 import { urlForImage } from '../sanity/lib/url-for-image';
 import styled from 'styled-components';
 
 interface PhotoGridProps {
-  filter?: 'featured' | 'all';
-  category?: string;
+  photos: SanityDocument[];
 }
 
 const GridContainer = styled.div`
@@ -14,12 +12,16 @@ const GridContainer = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 2rem;
   padding: 0 2.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
 `;
 
 const PhotoCard = styled.a`
   text-decoration: none;
   color: #1a202c;
   background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
   border: 1px solid #e2e8f0;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
@@ -41,35 +43,10 @@ const CardImage = styled.img`
   object-fit: cover;
 `;
 
-const PhotoGrid: React.FC<PhotoGridProps> = ({ filter = 'all', category }) => {
-  const [photos, setPhotos] = useState<SanityDocument[]>([]);
-
-  useEffect(() => {
-    let query = `*[_type == "photo"]`;
-    const params: { [key: string]: any } = {};
-
-    if (filter === 'featured') {
-      query += `[featured == true]`;
-    }
-
-    if (category) {
-      query += `[count((categories[]->title)[@ in [$category]]) > 0]`;
-      params.category = category;
-    }
-
-    query += ` | order(dateTaken desc)`;
-
-    const fetchPhotos = async () => {
-      const { data } = await loadQuery<SanityDocument[]>(query, params);
-      setPhotos(data);
-    };
-
-    fetchPhotos();
-  }, [filter, category]);
-
+const PhotoGrid: React.FC<PhotoGridProps> = ({ photos }) => {
   return (
     <GridContainer>
-      {photos.map((photo) => (
+      {(photos || []).map((photo) => (
         <PhotoCard key={photo._id} href={`/photo/${photo.slug.current}`}>
           {photo.image && (
             <CardImageContainer>

@@ -1,0 +1,47 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AdminPanel from '../components/AdminPanel.tsx';
+import { loadQuery } from '../sanity/lib/load-query';
+import type { SanityDocument } from '@sanity/client';
+
+// Fetch all photos to pass to the admin panel
+const { data: photos } = await loadQuery<SanityDocument[]>(`*[_type == "photo"] | order(_createdAt desc)`);
+---
+
+<Layout title="Admin Panel | Photo Portfolio">
+  <main class="admin-page-container">
+    <div class="admin-header">
+      <h1 class="admin-headline">Photo Management</h1>
+      <p class="admin-subheadline">Here you can upload, edit, and delete your photos.</p>
+    </div>
+    <AdminPanel initialPhotos={photos} client:only="react" />
+  </main>
+</Layout>
+
+<style>
+  .admin-page-container {
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .admin-header {
+    margin-bottom: 3rem;
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 2rem;
+  }
+
+  .admin-headline {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #1a202c;
+  }
+
+  .admin-subheadline {
+    font-size: 1.125rem;
+    color: #4a5568;
+    margin-top: 0.5rem;
+  }
+</style>
