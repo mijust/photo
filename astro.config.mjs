@@ -12,8 +12,8 @@ export default defineConfig({
       projectId: 'jav1zi17',
       dataset: 'production',
       useCdn: false, // See note on using the CDN
-      apiVersion: "2025-01-28", // insert the current date to access the latest version of the API
-      // studioBasePath: '/studio' // If you want to access the Studio on a route
+      apiVersion: "2025-09-07", // insert the current date to access the latest version of the API
+      studioBasePath: '/studio' // If you want to access the Studio on a route
     }),
     react(),
   ],

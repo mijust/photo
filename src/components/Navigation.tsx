@@ -1,24 +1,32 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-const NavContainer = styled.nav`
-  position: absolute;
+type Variant = 'light' | 'dark';
+
+const NavContainer = styled.nav<{ $variant: Variant }>`
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 1.5rem 2.5rem;
+  padding: 1rem 2.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #fff;
   font-family: 'Inter', sans-serif;
+  color: ${({ $variant }) => ($variant === 'light' ? '#1a202c' : '#ffffff')};
+  background: ${({ $variant }) =>
+    $variant === 'light'
+      ? 'rgba(255,255,255,0.85)'
+      : 'linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0))'};
+  backdrop-filter: ${({ $variant }) => ($variant === 'light' ? 'saturate(180%) blur(8px)' : 'none')};
+  border-bottom: ${({ $variant }) => ($variant === 'light' ? '1px solid #e5e7eb' : 'none')};
 `;
 
 const Logo = styled.a`
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: #fff;
+  color: inherit;
   text-decoration: none;
 `;
 
@@ -40,14 +48,11 @@ const NavLinks = styled.div<{ isOpen: boolean }>`
 `;
 
 const NavLink = styled.a`
-  color: #fff;
+  color: inherit;
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s ease;
-
-  &:hover {
-    color: #3B82F6;
-  }
+  transition: color 0.2s ease;
+  &:hover { color: #3B82F6; }
 `;
 
 const Hamburger = styled.div`
@@ -61,18 +66,18 @@ const Hamburger = styled.div`
   div {
     width: 25px;
     height: 3px;
-    background-color: white;
+    background-color: currentColor;
     margin: 5px;
     transition: all 0.3s ease;
   }
 `;
 
 
-const Navigation: React.FC = () => {
+const Navigation: React.FC<{ theme?: Variant }> = ({ theme = 'dark' }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <NavContainer>
+    <NavContainer $variant={theme}>
       <Logo href="/">Urban Pixels</Logo>
       <Hamburger onClick={() => setIsOpen(!isOpen)}>
         <div />

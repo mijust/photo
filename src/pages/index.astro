@@ -5,7 +5,13 @@ import { loadQuery } from '../sanity/lib/load-query';
 import type { SanityDocument } from '@sanity/client';
 import { urlForImage } from '../sanity/lib/url-for-image';
 
-const { data: heroPhoto } = await loadQuery<SanityDocument | null>(`*[_type == "photo" && featured == true] | order(_createdAt desc)[0]`);
+const { data: heroPhoto } = await loadQuery<SanityDocument | null>({
+  query: `*[_type == "photo" && featured == true] | order(_createdAt desc)[0]`,
+});
+
+const { data: featuredPhotos } = await loadQuery<SanityDocument[]>({
+  query: `*[_type == "photo" && featured == true] | order(dateTaken desc)`,
+});
 ---
 
 <Layout title="Urban Pixels - Discover the world through my lens">
@@ -22,7 +28,7 @@ const { data: heroPhoto } = await loadQuery<SanityDocument | null>(`*[_type == "
     <!-- Featured Works Section -->
     <section class="featured-works">
       <h2 class="section-headline">Featured Works</h2>
-      <PhotoGrid client:only="react" filter="featured" />
+  <PhotoGrid photos={featuredPhotos} />
     </section>
 
     <!-- Footer -->

@@ -1,17 +1,26 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PhotoGrid from '../components/PhotoGrid.tsx';
+import { loadQuery } from '../sanity/lib/load-query';
+import type { SanityDocument } from '@sanity/client';
+
+const { data: photos } = await loadQuery<SanityDocument[]>({
+  query: `*[_type == "photo"] | order(dateTaken desc)`,
+});
 ---
 
 <Layout title="Photo Gallery - Urban Pixels">
   <main class="main-content">
-    <header class="page-header">
-      <h1 class="page-title">All Photos</h1>
-      <p class="page-subtitle">A collection of my work.</p>
-    </header>
+    <section class="hero">
+      <div class="hero-inner">
+        <h1 class="title">Gallery</h1>
+        <p class="subtitle">A minimalist collection of my recent photos.</p>
+        <p class="meta">{photos.length} {photos.length === 1 ? 'photo' : 'photos'}</p>
+      </div>
+    </section>
 
-    <section>
-      <PhotoGrid client:only="react" />
+    <section class="grid-section">
+      <PhotoGrid photos={photos} />
     </section>
   </main>
 </Layout>
@@ -25,37 +34,22 @@ import PhotoGrid from '../components/PhotoGrid.tsx';
   .main-content {
     max-width: 1600px;
     margin: 0 auto;
-    padding: 0 2.5rem;
+    /* top space for fixed nav; no horizontal padding to avoid double with grid */
+    padding: 96px 0 0 0;
   }
+  .hero {
+    padding: 3.5rem 2.5rem 2rem;
+  }
+  .hero-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+  .title { font-size: 3rem; font-weight: 700; margin: 0 0 .5rem 0; color: var(--text-dark-blue); }
+  .subtitle { font-size: 1.1rem; color: #4A5568; margin: 0 0 .75rem 0; }
+  .meta { font-size: .95rem; color: #6b7280; margin: 0; }
 
-  .page-header {
-    padding: 4rem 0;
-    text-align: center;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 4rem;
-  }
-
-  .page-title {
-    font-size: 3rem;
-    font-weight: 700;
-    margin: 0 0 0.5rem 0;
-    color: var(--text-dark-blue);
-    text-transform: capitalize;
-  }
-
-  .page-subtitle {
-    font-size: 1.2rem;
-    color: #4A5568;
-    margin: 0;
-  }
+  .grid-section { padding-bottom: 5rem; }
 
   @media (max-width: 600px) {
-    .main-content {
-      padding: 0 1.5rem;
-    }
-    .page-header {
-      padding: 3rem 0;
-      margin-bottom: 3rem;
-    }
+    .main-content { padding-top: 84px; }
+    .hero { padding: 2.5rem 1.5rem 1.25rem; }
+    .title { font-size: 2.25rem; }
   }
 </style>
