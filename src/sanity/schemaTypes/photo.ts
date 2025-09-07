@@ -43,12 +43,6 @@ export const photoType = defineType({
       initialValue: false,
     }),
     defineField({
-      name: 'categories',
-      title: 'Categories',
-      type: 'array',
-      of: [{ type: 'reference', to: { type: 'category' } }],
-    }),
-    defineField({
       name: "dateTaken",
       type: "datetime",
     }),

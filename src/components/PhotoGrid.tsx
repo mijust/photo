@@ -6,7 +6,6 @@ import styled from 'styled-components';
 
 interface PhotoGridProps {
   filter?: 'featured' | 'all';
-  category?: string;
 }
 
 const GridContainer = styled.div`
@@ -41,7 +40,7 @@ const CardImage = styled.img`
   object-fit: cover;
 `;
 
-const PhotoGrid: React.FC<PhotoGridProps> = ({ filter = 'all', category }) => {
+const PhotoGrid: React.FC<PhotoGridProps> = ({ filter = 'all' }) => {
   const [photos, setPhotos] = useState<SanityDocument[]>([]);
 
   useEffect(() => {
@@ -52,11 +51,6 @@ const PhotoGrid: React.FC<PhotoGridProps> = ({ filter = 'all', category }) => {
       query += `[featured == true]`;
     }
 
-    if (category) {
-      query += `[count((categories[]->title)[@ in [$category]]) > 0]`;
-      params.category = category;
-    }
-
     query += ` | order(dateTaken desc)`;
 
     const fetchPhotos = async () => {
@@ -65,7 +59,7 @@ const PhotoGrid: React.FC<PhotoGridProps> = ({ filter = 'all', category }) => {
     };
 
     fetchPhotos();
-  }, [filter, category]);
+  }, [filter]);
 
   return (
     <GridContainer>

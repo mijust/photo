@@ -1,20 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PhotoGrid from '../components/PhotoGrid.tsx';
-
-const { category } = Astro.params;
-const categoryFromQuery = Astro.url.searchParams.get('category');
 ---
 
 <Layout title="Photo Gallery - Urban Pixels">
   <main class="main-content">
     <header class="page-header">
-      <h1 class="page-title">{categoryFromQuery ? `${categoryFromQuery} Photos` : 'All Photos'}</h1>
+      <h1 class="page-title">All Photos</h1>
       <p class="page-subtitle">A collection of my work.</p>
     </header>
 
     <section>
-      <PhotoGrid client:only="react" category={categoryFromQuery} />
+      <PhotoGrid client:only="react" />
     </section>
   </main>
 </Layout>

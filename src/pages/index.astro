@@ -6,7 +6,6 @@ import type { SanityDocument } from '@sanity/client';
 import { urlForImage } from '../sanity/lib/url-for-image';
 
 const { data: heroPhoto } = await loadQuery<SanityDocument | null>(`*[_type == "photo" && featured == true] | order(_createdAt desc)[0]`);
-const { data: categories } = await loadQuery<SanityDocument[]>(`*[_type == "category"] | order(title asc)`);
 ---
 
 <Layout title="Urban Pixels - Discover the world through my lens">
@@ -24,23 +23,6 @@ const { data: categories } = await loadQuery<SanityDocument[]>(`*[_type == "cate
     <section class="featured-works">
       <h2 class="section-headline">Featured Works</h2>
       <PhotoGrid client:only="react" filter="featured" />
-    </section>
-
-    <!-- Categories Section -->
-    <section class="categories-section">
-      <h2 class="section-headline">Discover by Category</h2>
-      <div class="category-grid">
-        {(categories || []).map(category => (
-          <a href={`/photos?category=${category.title}`} class="category-tile">
-            <div class="category-image-container">
-              <img src={urlForImage(category.image).width(400).height(400).fit('crop').url()} alt={category.title} class="category-image" />
-            </div>
-            <div class="category-overlay">
-              <h3 class="category-title">{category.title}</h3>
-            </div>
-          </a>
-        ))}
-      </div>
     </section>
 
     <!-- Footer -->
@@ -128,75 +110,9 @@ const { data: categories } = await loadQuery<SanityDocument[]>(`*[_type == "cate
     background-color: #2563EB;
   }
 
-  /* Featured Works & Categories */
-  .featured-works, .categories-section {
+  /* Featured Works */
+  .featured-works {
     padding: 6rem 0;
-  }
-
-  .categories-section {
-    background-color: var(--light-gray);
-  }
-
-  /* Category Grid */
-  .category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2.5rem;
-  }
-
-  .category-tile {
-    position: relative;
-    overflow: hidden;
-    border-radius: 8px;
-    aspect-ratio: 1 / 1;
-    text-decoration: none;
-    color: var(--white);
-  }
-
-  .category-image-container {
-    width: 100%;
-    height: 100%;
-  }
-
-  .category-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-  }
-
-  .category-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.4);
-    transition: background-color 0.4s ease;
-  }
-
-  .category-title {
-    font-size: 1.75rem;
-    font-weight: 600;
-    transition: transform 0.4s ease;
-  }
-
-  .category-tile:hover .category-image {
-    transform: scale(1.05);
-  }
-
-  .category-tile:hover .category-overlay {
-    background-color: rgba(0, 0, 0, 0.6);
-  }
-
-  .category-tile:hover .category-title {
-    transform: scale(1.1);
   }
 
   /* Footer */
