@@ -9,13 +9,6 @@ export async function loadQuery<QueryResponse>({
   query: string;
   params?: QueryParams;
 }) {
-  const { result } = await sanityClient.fetch<QueryResponse>(
-    query,
-    params ?? {},
-    { filterResponse: false }
-  );
-
-  return {
-    data: result,
-  };
+  const result = await sanityClient.fetch<QueryResponse>(query, params ?? {});
+  return { data: result };
 }

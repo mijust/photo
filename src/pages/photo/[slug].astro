@@ -21,7 +21,12 @@ export async function getStaticPaths() {
 const { params } = Astro;
 
 const { data: photo } = await loadQuery<any>({
-  query: `*[_type == "photo" && slug.current == $slug][0]`,
+  query: `*[_type == "photo" && slug.current == $slug][0]{
+    ...,
+    "orderKey": coalesce(dateTaken, _createdAt),
+    "prev": *[_type == "photo" && coalesce(dateTaken,_createdAt) < ^.orderKey] | order(coalesce(dateTaken,_createdAt) desc)[0]{title, "slug": slug.current},
+    "next": *[_type == "photo" && coalesce(dateTaken,_createdAt) > ^.orderKey] | order(coalesce(dateTaken,_createdAt) asc)[0]{title, "slug": slug.current}
+  }`,
   params,
 });
 
@@ -34,12 +39,34 @@ const formattedDate = photo.dateTaken ? new Date(photo.dateTaken).toLocaleDateSt
 
 <Layout title={photo.title}>
   <main class="main-content">
+    <nav class="breadcrumbs">
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/photos">Gallery</a>
+      <span>/</span>
+      <span aria-current="page">{photo.title}</span>
+    </nav>
     <article class="photo-container">
       <div class="photo-header">
         <h1 class="photo-title">{photo.title}</h1>
         {formattedDate && (
           <p class="photo-date">Captured on {formattedDate}</p>
         )}
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <a href="/photos" class="btn btn-secondary">← Back to Gallery</a>
+          <a href="/" class="btn btn-tertiary">Home</a>
+        </div>
+        <div class="toolbar-right">
+          {photo.prev && (
+            <a class="btn" href={`/photo/${photo.prev.slug}`}>← Prev</a>
+          )}
+          {photo.next && (
+            <a class="btn" href={`/photo/${photo.next.slug}`}>Next →</a>
+          )}
+        </div>
       </div>
 
       {photo.image && (
@@ -81,6 +108,16 @@ const formattedDate = photo.dateTaken ? new Date(photo.dateTaken).toLocaleDateSt
     margin: 0 auto;
     padding: 4rem 2.5rem;
   }
+  .breadcrumbs {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.95rem;
+    color: #4a5568;
+    margin-bottom: 1rem;
+  }
+  .breadcrumbs a { color: #1a202c; text-decoration: none; }
+  .breadcrumbs a:hover { text-decoration: underline; }
 
   .photo-header {
     text-align: center;
@@ -100,7 +137,11 @@ const formattedDate = photo.dateTaken ? new Date(photo.dateTaken).toLocaleDateSt
 
   .image-wrapper {
     margin-bottom: 4rem;
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.06);
   }
 
   .main-photo {
@@ -114,6 +155,29 @@ const formattedDate = photo.dateTaken ? new Date(photo.dateTaken).toLocaleDateSt
     grid-template-columns: 2fr 1fr;
     gap: 4rem;
   }
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    text-decoration: none;
+    color: #1a202c;
+    background: #fff;
+    transition: background-color .2s ease, border-color .2s ease;
+  }
+  .btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+  .btn-secondary { background: #1f2937; color: #fff; border-color: #1f2937; }
+  .btn-secondary:hover { background: #111827; border-color: #111827; }
+  .btn-tertiary { background: transparent; border-color: transparent; color: #4b5563; }
+  .btn-tertiary:hover { background: #f3f4f6; border-color: #e5e7eb; }
 
   .detail-section h2 {
     font-size: 1.5rem;
@@ -154,5 +218,6 @@ const formattedDate = photo.dateTaken ? new Date(photo.dateTaken).toLocaleDateSt
     .photo-title {
       font-size: 2.25rem;
     }
+  .toolbar { gap: .75rem; }
   }
 </style>
